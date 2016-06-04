@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">sUPer</string>
+    <string name="DefaultRM">3</string>
+    <string name="NewFighterDialogTitle">Ajouter un combattant</string>
+    <string name="NewFighterDialogTitleOkButton">Ajouter</string>
+    <string name="addButton">+</string>
+    <string name="nextPhaseButton">PHASE</string>
+    <string name="delButton">X</string>
+    <string name="unhurt">indemne</string>
+    <string name="attackButton">attaquer!</string>
+    <string name="defaultInit">0-0-0-0</string>
+    <string name="defaultND">69</string>
+    <string name="statButton">STAT</string>
+    <string name="invButton">INV</string>
+    <string name="defaultName">Mowgli</string>
+</resources>

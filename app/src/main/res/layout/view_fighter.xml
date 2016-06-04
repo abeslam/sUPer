@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+    >
+
+    <Button
+        android:id="@+id/delButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/statButton"
+        android:layout_alignBottom="@+id/invButton"
+        android:text="@string/delButton"
+        />
+
+    <Button
+        android:id="@+id/hurtButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/delButton"
+        android:layout_alignBottom="@id/invButton"
+        android:layout_alignTop="@id/statButton"
+        android:text="@string/unhurt"/>
+
+    <Button
+        android:id="@+id/attackButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/hurtButton"
+        android:layout_alignBottom="@id/invButton"
+        android:layout_alignTop="@id/statButton"
+        android:text="@string/attackButton"/>
+
+    <TextView
+        android:text="@string/defaultInit"
+        android:id="@+id/initText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/attackButton"
+        android:layout_alignBottom="@id/statButton"
+        />
+
+    <TextView
+        android:text="@string/defaultND"
+        android:id="@+id/ndText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/attackButton"
+        android:layout_below="@id/initText"
+        android:layout_alignLeft="@id/initText"
+        android:layout_alignBottom="@id/invButton"
+        />
+
+    <Button
+        android:text="@string/statButton"
+        android:id="@id/statButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/initText"
+        android:layout_alignParentTop="true"
+
+        />
+
+    <Button
+        android:text="@string/invButton"
+        android:id="@id/invButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/ndText"
+        android:layout_below="@id/statButton"
+        android:layout_alignLeft="@id/statButton"
+        />
+
+
+    <EditText
+        android:id="@+id/fighterName"
+        android:text="@string/defaultName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/invButton"
+        android:layout_alignParentLeft="true"
+        android:layout_alignBottom="@id/invButton"
+        android:layout_alignTop="@id/statButton"
+        />
+
+
+</merge>
