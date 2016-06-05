@@ -1,14 +1,28 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             tools:context="org.duckdns.spacedock.sUPer.presentation.NewFighterDialogFragment">
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:columnCount="3"
+            android:rowCount="2"
+            tools:context="org.duckdns.spacedock.sUPer.presentation.NewFighterDialogFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <EditText
-        android:id="@+id/testedit"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/DefaultRM"/>
+    <TextView
+        android:text="RM:"
+        android:layout_gravity="left"/>
 
-</FrameLayout>
+    <SeekBar
+        android:id="@+id/rmSeekBar"
+        android:max="4"
+        android:progress="2"
+        android:layout_columnWeight="100"
+        />
+
+    <TextView
+        android:id="@+id/rmValue"
+        android:layout_gravity="right"
+        android:text="3"
+
+        />
+
+
+</GridLayout>

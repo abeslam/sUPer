@@ -16,7 +16,7 @@ import org.duckdns.spacedock.sUPer.controle.SessionManager;
 public class FightBoard extends AppCompatActivity
 {
     /**
-     * listener utilisé pour recueillir les clicks sur les bouton principaux de l'interface de l'activité principale (pour l'instant phase et ajouter)
+     * listener utilisé pour recueillir les clicks sur les bouton principaux de l'interface de l'activité principale (pour l'instant phase et ajouter) on utilise un seul listener avec un if car ainsi un seul objet est créé et pas deux
      */
     private final View.OnClickListener fightBoardListener = new View.OnClickListener()
     {
@@ -37,7 +37,7 @@ public class FightBoard extends AppCompatActivity
     };
 
     /**
-     * listener utilisé pour recueillir les clicks sur les boutons des FighterView
+     * listener utilisé pour recueillir les clicks sur les boutons des FighterView : on le définit et l'instancie ici plutôt que dans FighterView car ainsi il n'y aura qu'un seul objet pour toute l'appli et pas une ribambelle
      */
     private final View.OnClickListener fighterViewListener = new View.OnClickListener()
     {
@@ -95,7 +95,7 @@ public class FightBoard extends AppCompatActivity
      *
      * @param p_RM
      */
-    void newFighterCallback(int p_RM)
+    void newFighterCallback(int p_RM)//TODO blinder contre les valeurs autres que [1;5] par émission d'exception
     {
         int index = manager.addFighter(p_RM);//récupération du premier indice libre
 

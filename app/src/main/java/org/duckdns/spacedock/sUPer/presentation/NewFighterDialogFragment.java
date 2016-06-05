@@ -7,17 +7,24 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
-import android.widget.EditText;
+import android.view.ViewGroup;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import org.duckdns.spacedock.sUPer.R;
 
 //TODO implémenter meilleure méthode de communication avec l'activité via une interface que l'activité implémentera et qui contiendra une méthode de callback. Actuellement dépendant de la classe spécifique de l'activité
 
+//TODO implémeter le bouton annuler
 public class NewFighterDialogFragment extends DialogFragment
 {
     private FightBoard activity;
 
-    private EditText testRM;
+    //widgets d'interraction de la boite de dialogue
+    private SeekBar rmSeekbar;
+
+    //elements de configuration
+    int rm;
 
     /**
      * listener du bouton OK de la boite de dialogue, appelle la métode de callback associée dans l'activité principale
@@ -26,9 +33,45 @@ public class NewFighterDialogFragment extends DialogFragment
     {
         public void onClick(DialogInterface dialog, int id)
         {
-            activity.newFighterCallback(Integer.parseInt(testRM.getText().toString()));//on passe à l'activité le RM désiré
+            activity.newFighterCallback(rm);//on passe à l'activité le RM désiré
         }
     };
+
+    /**
+     * listener des SeekBars de la boite de dialogue, là aussi on fait le choix d'un listener avec des if afin d'éviter de créer trop d'objets en RAM
+     */
+    private final SeekBar.OnSeekBarChangeListener seekBarListener = new SeekBar.OnSeekBarChangeListener()
+    {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+        {
+            int realValue = ++progress;//les SeekBar sont indicées à partir de 0
+            int id = seekBar.getId();
+            ViewGroup parent = (ViewGroup) seekBar.getParent();
+
+            if (id == R.id.rmSeekBar)//c'est la barre de RM qui a changé
+            {
+                TextView rmValue = (TextView) parent.findViewById(R.id.rmValue);
+                rmValue.setText("" + realValue);
+                rm = realValue;
+            }
+
+
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar)
+        {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar)
+        {
+
+        }
+    };
+
 
     @NonNull
     @Override
@@ -45,8 +88,16 @@ public class NewFighterDialogFragment extends DialogFragment
         builder.setView(fighterSetupView);
 
         //récupère des pointeurs sur les widgets d'interraction présents dans la boite dialogue
-        testRM = (EditText) fighterSetupView.findViewById(R.id.testedit);
-        //éventuelle initialisation des seekbar mais mieux dans layout
+        rmSeekbar = (SeekBar) fighterSetupView.findViewById(R.id.rmSeekBar);
+
+        //passe les listener aux widgets d'interraction
+        rmSeekbar.setOnSeekBarChangeListener(seekBarListener);
+
+
+        //initialise les valeurs de configuration
+        TextView rmValue = (TextView) fighterSetupView.findViewById(R.id.rmValue);
+        rm = rmSeekbar.getProgress() + 1;
+        rmValue.setText("" + rm);
 
 
         builder.setCancelable(true);//ainsi on pourra faire back pour annuler
