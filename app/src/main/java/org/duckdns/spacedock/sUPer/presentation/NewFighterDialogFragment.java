@@ -15,16 +15,17 @@ import org.duckdns.spacedock.sUPer.R;
 
 //TODO implémenter meilleure méthode de communication avec l'activité via une interface que l'activité implémentera et qui contiendra une méthode de callback. Actuellement dépendant de la classe spécifique de l'activité
 
-//TODO implémeter le bouton annuler
 public class NewFighterDialogFragment extends DialogFragment
 {
     private FightBoard activity;
 
     //widgets d'interraction de la boite de dialogue
     private SeekBar rmSeekbar;
+    private SeekBar nbSeekbar;
 
     //elements de configuration
     int rm;
+    int nb;
 
     /**
      * listener du bouton OK de la boite de dialogue, appelle la métode de callback associée dans l'activité principale
@@ -33,7 +34,7 @@ public class NewFighterDialogFragment extends DialogFragment
     {
         public void onClick(DialogInterface dialog, int id)
         {
-            activity.newFighterCallback(rm);//on passe à l'activité le RM désiré
+            activity.newFighterCallback(rm, nb);//on passe à l'activité le RM désiré
         }
     };
 
@@ -54,9 +55,15 @@ public class NewFighterDialogFragment extends DialogFragment
                 TextView rmValue = (TextView) parent.findViewById(R.id.rmValue);
                 rmValue.setText("" + realValue);
                 rm = realValue;
+            } else
+            {
+                if (id == R.id.nbSeekBar)//c'est la barre de nb qui a changé
+                {
+                    TextView nbValue = (TextView) parent.findViewById(R.id.nbValue);
+                    nbValue.setText("" + realValue);
+                    nb = realValue;
+                }
             }
-
-
         }
 
         @Override
@@ -89,20 +96,26 @@ public class NewFighterDialogFragment extends DialogFragment
 
         //récupère des pointeurs sur les widgets d'interraction présents dans la boite dialogue
         rmSeekbar = (SeekBar) fighterSetupView.findViewById(R.id.rmSeekBar);
+        nbSeekbar = (SeekBar) fighterSetupView.findViewById(R.id.nbSeekBar);
 
         //passe les listener aux widgets d'interraction
         rmSeekbar.setOnSeekBarChangeListener(seekBarListener);
-
+        nbSeekbar.setOnSeekBarChangeListener(seekBarListener);
 
         //initialise les valeurs de configuration
         TextView rmValue = (TextView) fighterSetupView.findViewById(R.id.rmValue);
         rm = rmSeekbar.getProgress() + 1;
         rmValue.setText("" + rm);
 
+        TextView nbValue = (TextView) fighterSetupView.findViewById(R.id.nbValue);
+        nb = nbSeekbar.getProgress() + 1;
+        nbValue.setText("" + nb);
+
 
         builder.setCancelable(true);//ainsi on pourra faire back pour annuler
         //Passe au bouton positif son listener, le négatif est géré par le fait qu'il n'y a simplement rien à faire en ce cas
         builder.setPositiveButton(R.string.NewFighterDialogTitleOkButton, newFighterDialogListener);
+        builder.setNegativeButton(R.string.NewFighterDialogTitleCancelButton, null);
 
         //la méthode create produit la boite mais ne l'afiche pas, ce sera l'activité qui appellera show() sur ce fragment
         return (builder.create());

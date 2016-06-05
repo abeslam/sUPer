@@ -1,5 +1,8 @@
 package org.duckdns.spacedock.sUPer.controle;
 
+import java.util.LinkedList;
+import java.util.ListIterator;
+
 /**
  * Contrôleur gérant la session à la fois comme singleton de configuration mais aussi avec des méthodes de contrôle
  *
@@ -7,8 +10,15 @@ package org.duckdns.spacedock.sUPer.controle;
  */
 public class SessionManager
 {
-    //première indice non libre de la liste de combattants
+    /**
+     * premier indice libre à la fin de la liste des combattants (il peut y a voir des trous dans la liste)
+     */
     private int currentIndex = 0;
+    /**
+     * liste des indices libres dans la liste des combattants
+     */
+    LinkedList<Integer> listFreeIndex = new LinkedList<Integer>();
+    ListIterator<Integer> indexIterator = listFreeIndex.listIterator();
 
     /**
      * phase actuelle de la session de jeu
@@ -45,13 +55,34 @@ public class SessionManager
     /**
      * Crée un nouveau combattant côté controleur
      *
-     * @param p_RM le RM du combattant à créer
+     * @param rm le RM du combattant à créer
      * @return l'indice qui a été affecté au nouveau combattant
      */
-    public int addFighter(int p_RM)
-    {//TODO : renvoyer plutôt la première case libre, modifier la suppresion des combattants pour qu'elle mette à jour ici une collection d'indices libres
-        //renvoie l'indice courant (correspondant au nombre de combattants) puis incrémente l'indice
-        return (currentIndex++);
+    public int addFighter(int rm)
+    {
+        int resultat;
+
+        if (indexIterator.hasNext())//il y a eu des libérations on renvoie donc la première case libre
+        {
+            resultat = (indexIterator.next()).intValue();
+            indexIterator.previous();//on a récupéré une valeur, il faut donc la supprimer de la liste car cet indice va désormais être occupé par un combattant
+            indexIterator.remove();
+        } else//pas de case libre, la première case libre est donc l'indice, on l'incrémente après l'avoir récupéré
+        {
+            resultat = currentIndex++;
+        }
+        return (resultat);
+    }
+
+    /**
+     * Supprime un combattant côté contrôleur
+     *
+     * @param index
+     */
+    public void delFighter(int index)
+    {
+        indexIterator.add(new Integer(index));
+        indexIterator.previous();//replace le curseur au cran d'avant afin que hasNext() puisse répondre true lors de sa prochaine interrogation
     }
 
 }

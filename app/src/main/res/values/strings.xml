@@ -3,6 +3,7 @@
     <string name="DefaultRM">3</string>
     <string name="NewFighterDialogTitle">Ajouter un combattant</string>
     <string name="NewFighterDialogTitleOkButton">Ajouter</string>
+    <string name="NewFighterDialogTitleCancelButton">Annuler</string>
     <string name="addButton">+</string>
     <string name="nextPhaseButton">PHASE</string>
     <string name="delButton">X</string>

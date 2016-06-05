@@ -10,6 +10,8 @@ import android.widget.EditText;
 import org.duckdns.spacedock.sUPer.R;
 import org.duckdns.spacedock.sUPer.controle.SessionManager;
 
+import java.util.ArrayList;
+
 /**
  * Activité principale : gère l'écran depuis lequel l'application débute
  */
@@ -45,13 +47,12 @@ public class FightBoard extends AppCompatActivity
         public void onClick(View view)
         {
             int id = view.getId();
-            FighterView parent = (FighterView) ((ViewGroup) view.getParent());
+            FighterView parent = (FighterView) (view.getParent());
             int parentIndex = parent.getFighterIndex();
 
             if (id == R.id.delButton)//c'est le bouton "supprimer" qui a été cliqué
             {
-                EditText placeholder = (EditText) parent.findViewById(R.id.fighterName);
-                placeholder.setText("dont't kill #" + parentIndex);
+                delFighter(parentIndex);
             } else
             {
                 if (id == R.id.hurtButton)//c'est le bouton pour infliger des dégâts qui a été cliqué
@@ -68,6 +69,8 @@ public class FightBoard extends AppCompatActivity
     private Button addButton;
     private Button nextPhaseButton;
     private ViewGroup rootElement;
+
+    private ArrayList<FighterView> fighterList = new ArrayList<FighterView>();
 
     /**
      * contrôleur unique (1 par lancement) de l'application
@@ -93,24 +96,48 @@ public class FightBoard extends AppCompatActivity
     /**
      * callback appelée par la boite de dialogue de création de nouveau combattant
      *
-     * @param p_RM
+     * @param rm rang de menace
+     * @param nb nb de combattants à créer
      */
-    void newFighterCallback(int p_RM)//TODO blinder contre les valeurs autres que [1;5] par émission d'exception
+    void newFighterCallback(int rm, int nb)//TODO blinder contre les valeurs autres que [1;5] par émission d'exception et vérifier aussi que ca ne depasse pas la taille du tableau
     {
-        int index = manager.addFighter(p_RM);//récupération du premier indice libre
+        for (int i = 0; i < nb; ++i)
+        {
+            int index = manager.addFighter(rm);//récupération du premier indice libre
 
-        //création de la nouvelle FighterView
-        FighterView view = new FighterView(this, index);
-        EditText name = (EditText) view.findViewById(R.id.fighterName);
-        name.setText("" + p_RM);
+            //création de la nouvelle FighterView
+            FighterView view = new FighterView(this, index);
+            EditText name = (EditText) view.findViewById(R.id.fighterName);
+            name.setText("index:" + index);
 
-        //passage des listeners aux divers boutons de la FighterView
-        Button delButton = (Button) view.findViewById(R.id.delButton);
-        delButton.setOnClickListener(fighterViewListener);
-        Button hurtButton = (Button) view.findViewById(R.id.hurtButton);
-        hurtButton.setOnClickListener(fighterViewListener);
+            //passage des listeners aux divers boutons de la FighterView
+            Button delButton = (Button) view.findViewById(R.id.delButton);
+            delButton.setOnClickListener(fighterViewListener);
+            Button hurtButton = (Button) view.findViewById(R.id.hurtButton);
+            hurtButton.setOnClickListener(fighterViewListener);
 
-        //ajout de la vue au paneau coulissant
-        rootElement.addView(view);
+            //ajout de la vue au paneau coulissant puis à la liste maintenue en interne par l'activité
+            rootElement.addView(view);
+            if (index == fighterList.size())
+            {
+                fighterList.add(view);//en ce cas c'est un ajout en queue
+            } else
+            {
+                fighterList.set(index, view);//en ce cas on remplace une des références nulles par l'objet
+            }
+        }
+    }
+
+    /**
+     * supprime un combattant : tant du côté graphique qu'auprès du SessionManager
+     *
+     * @param index l'indice du combattant à supprimer
+     */
+    private void delFighter(int index)
+    {
+        View view = fighterList.get(index);
+        rootElement.removeView(view);//on supprime la fighterview côté graphique
+        fighterList.set(index, null);//on supprime l'élément de la liste maintenue par l'application (pas par la méthode remove(), qui retrie ensuite pour supprimer l'espace vide et perd donc les indices tels que maintenus dans l'appli)
+        manager.delFighter(index);//on supprime maintenant le personnage côté contrôle
     }
 }

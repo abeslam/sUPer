@@ -21,7 +21,23 @@
         android:id="@+id/rmValue"
         android:layout_gravity="right"
         android:text="3"
+        />
 
+    <TextView
+        android:text="nb:"
+        android:layout_gravity="left"/>
+
+    <SeekBar
+        android:id="@+id/nbSeekBar"
+        android:max="4"
+        android:progress="0"
+        android:layout_columnWeight="100"
+        />
+
+    <TextView
+        android:id="@+id/nbValue"
+        android:layout_gravity="right"
+        android:text="1"
         />
 
 
