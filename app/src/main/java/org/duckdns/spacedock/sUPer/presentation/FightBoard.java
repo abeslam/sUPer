@@ -12,6 +12,10 @@ import org.duckdns.spacedock.sUPer.controle.SessionManager;
 
 import java.util.ArrayList;
 
+//TODO : trier les éléments de strings.xml et décider d'un mode de nommage cohérent
+//TODO: renommer tous les paramétres en p_, les membres en m_ ; on ne se souciera pas des variables locales
+//TODO vérifier toutes les méthodes et les blinder suivant les principes de la prog par contrat
+
 /**
  * Activité principale : gère l'écran depuis lequel l'application débute
  */
@@ -27,7 +31,7 @@ public class FightBoard extends AppCompatActivity
         {
             if (view.getId() == R.id.addButton)//c'est le bouton "ajouter" qui a été cliqué
             {
-                new NewFighterDialogFragment().show(getSupportFragmentManager(), "NewFighterDialog");//ouvre la boite de dialogue de configuration
+                new NewFighterDialogFragment().show(getSupportFragmentManager(), "NewFighterDialog");//ouvre la boite de dialogue de configuration de nouveaux combattants
             } else
             {
                 if (view.getId() == R.id.nextPhaseButton)//c'est le bouton "phase" qui a été cliqué
@@ -60,6 +64,13 @@ public class FightBoard extends AppCompatActivity
                     //test provisoire
                     Button placeholder = (Button) view;
                     placeholder.setText("uncommonandverylong");
+                } else
+                {
+                    if (id == R.id.invButton)//c'est le bouton d'inventaire qui a été cliqué
+                    {
+                        INVDialogFragment dialogFragment = INVDialogFragment.getInstance(parentIndex, manager.getVDRolled(parentIndex), manager.getVDKept(parentIndex));//récupère une instance du fragment en passant l'index et les caracs de l'arme en paramétre à la méthode statique qui le met en bundle
+                        dialogFragment.show(getSupportFragmentManager(), "INVDialog"); //ouvre la boite de dialogue de configuration mais seulement après avoir indiqué au fragment l'indice de combattant qui le concerne
+                    }
                 }
             }
         }
@@ -110,13 +121,15 @@ public class FightBoard extends AppCompatActivity
                 //création de la nouvelle FighterView
                 FighterView view = new FighterView(this, index);
                 EditText name = (EditText) view.findViewById(R.id.fighterName);
-                name.setText("index:" + index);
+                name.setText(manager.getName(index) + " i:" + index);
 
                 //passage des listeners aux divers boutons de la FighterView
                 Button delButton = (Button) view.findViewById(R.id.delButton);
                 delButton.setOnClickListener(fighterViewListener);
                 Button hurtButton = (Button) view.findViewById(R.id.hurtButton);
                 hurtButton.setOnClickListener(fighterViewListener);
+                Button invButton = (Button) view.findViewById(R.id.invButton);
+                invButton.setOnClickListener(fighterViewListener);
 
                 //ajout de la vue au paneau coulissant puis à la liste maintenue en interne par l'activité
                 rootElement.addView(view);
@@ -155,9 +168,34 @@ public class FightBoard extends AppCompatActivity
      */
     private void delFighter(int index)
     {
-        View view = fighterList.get(index);
-        rootElement.removeView(view);//on supprime la fighterview côté graphique
-        fighterList.set(index, null);//on supprime l'élément de la liste maintenue par l'application (pas par la méthode remove(), qui retrie ensuite pour supprimer l'espace vide et perd donc les indices tels que maintenus dans l'appli)
-        manager.delFighter(index);//on supprime maintenant le personnage côté contrôle
+        if (index >= 0)
+        {
+            View view = fighterList.get(index);
+            rootElement.removeView(view);//on supprime la fighterview côté graphique
+            fighterList.set(index, null);//on supprime l'élément de la liste maintenue par l'application (pas par la méthode remove(), qui retrie ensuite pour supprimer l'espace vide et perd donc les indices tels que maintenus dans l'appli)
+            manager.delFighter(index);//on supprime maintenant le personnage côté contrôle
+        } else
+        {
+            throw new IllegalArgumentException("index<0");
+
+        }
+    }
+
+    /**
+     * passe au SessionManager une nouvelle arme configurée dans la boite de dialogue d'inventaire
+     *
+     * @param p_index  l'indice du combattant concerné
+     * @param p_rolled
+     * @param p_kept
+     */
+    void INVChangedCallback(int p_index, int p_rolled, int p_kept)
+    {
+        if (p_index >= 0)
+        {
+            manager.setArme(p_index, p_rolled, p_kept);
+        } else
+        {
+            throw new IllegalArgumentException("index<0");
+        }
     }
 }

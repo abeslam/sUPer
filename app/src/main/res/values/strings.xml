@@ -2,8 +2,8 @@
     <string name="app_name">sUPer</string>
     <string name="DefaultRM">3</string>
     <string name="NewFighterDialogTitle">Ajouter un combattant</string>
-    <string name="NewFighterDialogTitleOkButton">Ajouter</string>
-    <string name="NewFighterDialogTitleCancelButton">Annuler</string>
+    <string name="NewFighterDialogOkButton">Ajouter</string>
+    <string name="DialogCancelButton">Annuler</string>
     <string name="addButton">+</string>
     <string name="nextPhaseButton">PHASE</string>
     <string name="delButton">X</string>
@@ -14,4 +14,10 @@
     <string name="statButton">STAT</string>
     <string name="invButton">INV</string>
     <string name="defaultName">Mowgli</string>
+    <string name="vdEquals">VD=</string>
+    <string name="g">g</string>
+    <string name="vdDefaultLance">0</string>
+    <string name="vdDefaultGarde">0</string>
+    <string name="INVDialogTitle">Inventaire</string>
+    <string name="invDialogOkButton">Modifier</string>
 </resources>

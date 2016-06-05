@@ -114,8 +114,8 @@ public class NewFighterDialogFragment extends DialogFragment
 
         builder.setCancelable(true);//ainsi on pourra faire back pour annuler
         //Passe au bouton positif son listener, le négatif est géré par le fait qu'il n'y a simplement rien à faire en ce cas
-        builder.setPositiveButton(R.string.NewFighterDialogTitleOkButton, newFighterDialogListener);
-        builder.setNegativeButton(R.string.NewFighterDialogTitleCancelButton, null);
+        builder.setPositiveButton(R.string.NewFighterDialogOkButton, newFighterDialogListener);
+        builder.setNegativeButton(R.string.DialogCancelButton, null);
 
         //la méthode create produit la boite mais ne l'afiche pas, ce sera l'activité qui appellera show() sur ce fragment
         return (builder.create());
