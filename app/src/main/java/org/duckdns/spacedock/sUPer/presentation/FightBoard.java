@@ -101,30 +101,50 @@ public class FightBoard extends AppCompatActivity
      */
     void newFighterCallback(int rm, int nb)//TODO blinder contre les valeurs autres que [1;5] par émission d'exception et vérifier aussi que ca ne depasse pas la taille du tableau
     {
-        for (int i = 0; i < nb; ++i)
+        if (rm <= 5 && rm > 0 && nb > 0)
         {
-            int index = manager.addFighter(rm);//récupération du premier indice libre
-
-            //création de la nouvelle FighterView
-            FighterView view = new FighterView(this, index);
-            EditText name = (EditText) view.findViewById(R.id.fighterName);
-            name.setText("index:" + index);
-
-            //passage des listeners aux divers boutons de la FighterView
-            Button delButton = (Button) view.findViewById(R.id.delButton);
-            delButton.setOnClickListener(fighterViewListener);
-            Button hurtButton = (Button) view.findViewById(R.id.hurtButton);
-            hurtButton.setOnClickListener(fighterViewListener);
-
-            //ajout de la vue au paneau coulissant puis à la liste maintenue en interne par l'activité
-            rootElement.addView(view);
-            if (index == fighterList.size())
+            for (int i = 0; i < nb; ++i)
             {
-                fighterList.add(view);//en ce cas c'est un ajout en queue
+                int index = manager.addFighter(rm);//récupération du premier indice libre
+
+                //création de la nouvelle FighterView
+                FighterView view = new FighterView(this, index);
+                EditText name = (EditText) view.findViewById(R.id.fighterName);
+                name.setText("index:" + index);
+
+                //passage des listeners aux divers boutons de la FighterView
+                Button delButton = (Button) view.findViewById(R.id.delButton);
+                delButton.setOnClickListener(fighterViewListener);
+                Button hurtButton = (Button) view.findViewById(R.id.hurtButton);
+                hurtButton.setOnClickListener(fighterViewListener);
+
+                //ajout de la vue au paneau coulissant puis à la liste maintenue en interne par l'activité
+                rootElement.addView(view);
+                if (index == fighterList.size())
+                {
+                    fighterList.add(view);//en ce cas c'est un ajout en queue
+                } else
+                {
+                    fighterList.set(index, view);//en ce cas on remplace une des références nulles par l'objet
+                }
+            }
+        } else
+        {
+            String message;
+            if (rm > 5)
+            {
+                message = "rm>5";
             } else
             {
-                fighterList.set(index, view);//en ce cas on remplace une des références nulles par l'objet
+                if (rm <= 0)
+                {
+                    message = "rm<=0";
+                } else
+                {
+                    message = "nb<=0";
+                }
             }
+            throw new IllegalArgumentException(message);
         }
     }
 
