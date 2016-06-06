@@ -1,5 +1,6 @@
 package org.duckdns.spacedock.sUPer.presentation;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -12,17 +13,26 @@ import org.duckdns.spacedock.sUPer.R;
 import org.duckdns.spacedock.sUPer.controle.SessionManager;
 
 import java.util.ArrayList;
+import java.util.ListIterator;
 
 //TODO : trier les éléments de strings.xml et décider d'un mode de nommage cohérent
 //TODO: renommer tous les paramétres en p_, les membres en m_ ; on ne se souciera pas des variables locales
 //TODO vérifier toutes les méthodes et les blinder suivant les principes de la prog par contrat
 //TODO dans toute l'application améliorer l'ordre de déclaration des membres par souci de cohérence
-//TODO à terme il pourrait s'avérer judicieux de fusionner la fighterList des vues graĥiques maintenues par cette application et la list équivalente du SessionManager ou de simplment supprimer la première qui n'est utilisée que pour supprimer les vues, on pourrait affecter un id aux vues et les supprimer via une recherche sur celui-ci
+//TODO à terme il pourrait s'avérer judicieux de fusionner la liste des vues graĥiques maintenues par cette application et la list équivalente du SessionManager (en un objet à instance unique dérivé d'ArrayList) ou de simplment supprimer la première qui n'est utilisée que pour supprimer les vues, on pourrait affecter un id aux vues et les supprimer via une recherche sur celui-ci
 /**
  * Activité principale : gère l'écran depuis lequel l'application débute
  */
 public class FightBoard extends AppCompatActivity
 {
+
+    private enum TextColor
+    {
+        ALERT, OK
+    }
+
+    ;
+
     /**
      * listener utilisé pour recueillir les clicks sur les bouton principaux de l'interface de l'activité principale (pour l'instant phase et ajouter) on utilise un seul listener avec un if car ainsi un seul objet est créé et pas deux
      */
@@ -38,7 +48,28 @@ public class FightBoard extends AppCompatActivity
             {
                 if (view.getId() == R.id.nextPhaseButton)//c'est le bouton "phase" qui a été cliqué
                 {
-                    //à implémenter
+                    ArrayList<Integer> activeIndexes = manager.nextPhase();
+                    ListIterator<Integer> fighterIterator = activeIndexes.listIterator();
+
+
+                    for (int index = 0; index < fighterList.size() && fighterIterator.hasNext(); ++index)//cette construction est possible parce que tous les tableaux sont maintenus triés
+                    {
+                        FighterView currentPane = fighterList.get(index);
+                        if (index == fighterIterator.next())//ce combattant sera actif,
+                        {
+                            //appliquer le listener si pas déjà fait; passer le texte en vert
+                            setTextColor((TextView) currentPane.findViewById(R.id.attackButton), TextColor.OK);
+                        } else//le combattant est inactif ou n'existe pas
+                        {
+                            fighterIterator.previous();
+                            if (currentPane != null)//currentPane pourrait bien être null puisqu'on ne supprime pas les cases vides afin de maintenir les index en lien avec la structuration physique des tables
+                            {
+                                //supprimer le listener; passer le texte en rouge
+                                setTextColor((TextView) currentPane.findViewById(R.id.attackButton), TextColor.ALERT);
+                            }
+                        }
+                    }
+                    ((Button) view).setText("" + manager.getCurrentPhase());
                 }
             }
         }
@@ -117,6 +148,7 @@ public class FightBoard extends AppCompatActivity
 
         //affectation des listeners
         addButton.setOnClickListener(fightBoardListener);
+        nextPhaseButton.setOnClickListener(fightBoardListener);
     }
 
     /**
@@ -131,7 +163,9 @@ public class FightBoard extends AppCompatActivity
         {
             for (int i = 0; i < nb; ++i)
             {
-                int index = manager.addFighter(rm);//récupération du premier indice libre et création du combattant côté contrôle
+                SessionManager.CreationResult creationResult = manager.addFighter(rm);//récupération du premier indice libre et de si il est actif dans cette phase puis création du combattant côté contrôle
+                int index = creationResult.getIndex();
+                boolean activeFighter = creationResult.isActive();
 
                 //création de la nouvelle FighterView
                 FighterView view = new FighterView(this, index);
@@ -151,6 +185,15 @@ public class FightBoard extends AppCompatActivity
                 statButton.setOnClickListener(fighterViewListener);
                 Button attackButton = (Button) view.findViewById(R.id.attackButton);
                 attackButton.setOnClickListener(fighterViewListener);
+
+                //gestion du statut actif ou non du nouveau combattant
+                if (activeFighter)
+                {
+                    setTextColor(attackButton, TextColor.OK);
+                } else
+                {
+                    setTextColor(attackButton, TextColor.ALERT);
+                }
 
                 //ajout de la vue au paneau coulissant puis à la liste maintenue en interne par l'activité
                 rootElement.addView(view);
@@ -227,6 +270,20 @@ public class FightBoard extends AppCompatActivity
         } else
         {
             throw new IllegalArgumentException("index<0");
+        }
+    }
+
+    private void setTextColor(TextView p_view, TextColor p_color)
+    {
+        if (p_color == TextColor.ALERT)
+        {
+            p_view.setTextColor(Color.RED);
+        } else
+        {
+            if (p_color == TextColor.OK)
+            {
+                p_view.setTextColor(Color.GREEN);
+            }
         }
     }
 }

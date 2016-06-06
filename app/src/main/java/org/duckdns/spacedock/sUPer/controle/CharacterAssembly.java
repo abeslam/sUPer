@@ -83,4 +83,9 @@ class CharacterAssembly
     {
         return m_perso.getArme().getDesGardes();
     }
+
+    boolean isActive(int p_phase)
+    {
+        return m_perso.isActif(p_phase);
+    }
 }

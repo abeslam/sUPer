@@ -66,22 +66,27 @@ public class SessionManager
      * @param rm le RM du combattant à créer
      * @return l'indice qui a été affecté au nouveau combattant
      */
-    public int addFighter(int rm)
+    public CreationResult addFighter(int rm)
     {
         int newIndex;
-
+        CharacterAssembly newFighter;
         if (indexIterator.hasNext())//il y a eu des libérations on renvoie donc la première case libre
         {
             newIndex = (indexIterator.next()).intValue();
             indexIterator.previous();//on a récupéré une valeur, il faut donc la supprimer de la liste car cet indice va désormais être occupé par un combattant
             indexIterator.remove();
-            listFighters.set(newIndex, new CharacterAssembly(newIndex, rm));//on ajoute le nouveau combattant à la liste à la place de celui qu'il remplace
+            newFighter = new CharacterAssembly(newIndex, rm);
+            listFighters.set(newIndex, newFighter);//on ajoute le nouveau combattant à la liste à la place de celui qu'il remplace
         } else//pas de case libre, la première case libre est donc l'indice, on l'incrémente après l'avoir récupéré
         {
             newIndex = currentIndex++;
-            listFighters.add(new CharacterAssembly(newIndex, rm));//le nouveau combattant est ajouté en queue
+            newFighter = new CharacterAssembly(newIndex, rm);
+            listFighters.add(newFighter);//le nouveau combattant est ajouté en queue
         }
-        return (newIndex);
+
+        boolean isActive = newFighter.isActive(currentPhase);
+
+        return (new CreationResult(newIndex, isActive));
     }
 
     /**
@@ -91,11 +96,31 @@ public class SessionManager
      */
     public void delFighter(int index)
     {
-        indexIterator.add(new Integer(index));
+        indexIterator.add(index);
         indexIterator.previous();//replace le curseur au cran d'avant afin que hasNext() puisse répondre true lors de sa prochaine interrogation
 
         listFighters.set(index, null);//le combattant est supprimé de la liste (avec set() et pas remove() afin que sa case reste libre pour ne pas bordéliser les indices des autres
     }
+
+    public ArrayList<Integer> nextPhase()
+    {
+        ++currentPhase;
+        ArrayList<Integer> activeIndexes = new ArrayList<>();
+        for (int index = 0; index < listFighters.size(); ++index)
+        {
+            CharacterAssembly currentfighter = listFighters.get(index);
+            if (currentfighter != null && currentfighter.isActive(currentPhase))//currentFighter peut très bien être null car on remplace juste les combattants retirés par des null pour conserver les indices
+            {
+                activeIndexes.add(index);
+            }
+        }
+
+        return activeIndexes;
+    }
+
+
+
+
 
     /**
      * renvoie le nom d'un combattant
@@ -143,5 +168,32 @@ public class SessionManager
     public int getFighterND(int p_index)
     {
         return listFighters.get(p_index).getFighterND();
+    }
+
+    public int getCurrentPhase()
+    {
+        return currentPhase;
+    }
+
+    public class CreationResult
+    {
+        int m_fighterIndex;
+        boolean m_active;
+
+        public CreationResult(int p_index, boolean p_active)
+        {
+            m_fighterIndex = p_index;
+            m_active = p_active;
+        }
+
+        public int getIndex()
+        {
+            return m_fighterIndex;
+        }
+
+        public boolean isActive()
+        {
+            return (m_active);
+        }
     }
 }
