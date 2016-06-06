@@ -130,13 +130,18 @@ public class SessionManager
         return listFighters.get(p_index).getVDKept();
     }
 
-    public void setND(int p_index, int p_ND)
+    public void setTargetND(int p_index, int p_ND)
     {
-        listFighters.get(p_index).setND(p_ND);
+        listFighters.get(p_index).setTargetND(p_ND);
     }
 
-    public int getND(int p_index)
+    public int getTargetND(int p_index)
     {
-        return listFighters.get(p_index).getND();
+        return listFighters.get(p_index).getTargetND();
+    }
+
+    public int getFighterND(int p_index)
+    {
+        return listFighters.get(p_index).getFighterND();
     }
 }

@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import org.duckdns.spacedock.sUPer.R;
 import org.duckdns.spacedock.sUPer.controle.SessionManager;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
 //TODO: renommer tous les paramétres en p_, les membres en m_ ; on ne se souciera pas des variables locales
 //TODO vérifier toutes les méthodes et les blinder suivant les principes de la prog par contrat
 //TODO dans toute l'application améliorer l'ordre de déclaration des membres par souci de cohérence
-
+//TODO à terme il pourrait s'avérer judicieux de fusionner la fighterList des vues graĥiques maintenues par cette application et la list équivalente du SessionManager ou de simplment supprimer la première qui n'est utilisée que pour supprimer les vues, on pourrait affecter un id aux vues et les supprimer via une recherche sur celui-ci
 /**
  * Activité principale : gère l'écran depuis lequel l'application débute
  */
@@ -80,7 +81,7 @@ public class FightBoard extends AppCompatActivity
                         {
                             if (id == R.id.statButton)//c'est le bouton "statut" qui a été cliqué
                             {
-                                STATDialogFragment dialogFragment = STATDialogFragment.getInstance(parentIndex, manager.getND(parentIndex));
+                                STATDialogFragment dialogFragment = STATDialogFragment.getInstance(parentIndex, manager.getTargetND(parentIndex));
                                 dialogFragment.show(getSupportFragmentManager(), "STATDialog"); //ouvre la boite de dialogue de configuration mais seulement après avoir indiqué au fragment ses paramétres
                             }
                         }
@@ -130,12 +131,14 @@ public class FightBoard extends AppCompatActivity
         {
             for (int i = 0; i < nb; ++i)
             {
-                int index = manager.addFighter(rm);//récupération du premier indice libre
+                int index = manager.addFighter(rm);//récupération du premier indice libre et création du combattant côté contrôle
 
                 //création de la nouvelle FighterView
                 FighterView view = new FighterView(this, index);
                 EditText name = (EditText) view.findViewById(R.id.fighterName);
                 name.setText(manager.getName(index) + " i:" + index);
+                TextView fighterND = (TextView) view.findViewById(R.id.ndText);
+                fighterND.setText("ND:" + manager.getFighterND(index));
 
                 //passage des listeners aux divers boutons de la FighterView
                 Button delButton = (Button) view.findViewById(R.id.delButton);
@@ -220,7 +223,7 @@ public class FightBoard extends AppCompatActivity
     {
         if (p_index >= 0)
         {
-            manager.setND(p_index, p_ND);
+            manager.setTargetND(p_index, p_ND);
         } else
         {
             throw new IllegalArgumentException("index<0");
