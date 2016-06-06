@@ -15,6 +15,7 @@ import java.util.ArrayList;
 //TODO : trier les éléments de strings.xml et décider d'un mode de nommage cohérent
 //TODO: renommer tous les paramétres en p_, les membres en m_ ; on ne se souciera pas des variables locales
 //TODO vérifier toutes les méthodes et les blinder suivant les principes de la prog par contrat
+//TODO dans toute l'application améliorer l'ordre de déclaration des membres par souci de cohérence
 
 /**
  * Activité principale : gère l'écran depuis lequel l'application débute
@@ -69,7 +70,20 @@ public class FightBoard extends AppCompatActivity
                     if (id == R.id.invButton)//c'est le bouton d'inventaire qui a été cliqué
                     {
                         INVDialogFragment dialogFragment = INVDialogFragment.getInstance(parentIndex, manager.getVDRolled(parentIndex), manager.getVDKept(parentIndex));//récupère une instance du fragment en passant l'index et les caracs de l'arme en paramétre à la méthode statique qui le met en bundle
-                        dialogFragment.show(getSupportFragmentManager(), "INVDialog"); //ouvre la boite de dialogue de configuration mais seulement après avoir indiqué au fragment l'indice de combattant qui le concerne
+                        dialogFragment.show(getSupportFragmentManager(), "INVDialog"); //ouvre la boite de dialogue de configuration mais seulement après avoir indiqué au fragment ses paramétres
+                    } else
+                    {
+                        if (id == R.id.attackButton)//c'est le bouton "attaquer" qui a été cliqué
+                        {
+                            //TODO implémenter
+                        } else
+                        {
+                            if (id == R.id.statButton)//c'est le bouton "statut" qui a été cliqué
+                            {
+                                STATDialogFragment dialogFragment = STATDialogFragment.getInstance(parentIndex, manager.getND(parentIndex));
+                                dialogFragment.show(getSupportFragmentManager(), "STATDialog"); //ouvre la boite de dialogue de configuration mais seulement après avoir indiqué au fragment ses paramétres
+                            }
+                        }
                     }
                 }
             }
@@ -130,6 +144,10 @@ public class FightBoard extends AppCompatActivity
                 hurtButton.setOnClickListener(fighterViewListener);
                 Button invButton = (Button) view.findViewById(R.id.invButton);
                 invButton.setOnClickListener(fighterViewListener);
+                Button statButton = (Button) view.findViewById(R.id.statButton);
+                statButton.setOnClickListener(fighterViewListener);
+                Button attackButton = (Button) view.findViewById(R.id.attackButton);
+                attackButton.setOnClickListener(fighterViewListener);
 
                 //ajout de la vue au paneau coulissant puis à la liste maintenue en interne par l'activité
                 rootElement.addView(view);
@@ -177,7 +195,6 @@ public class FightBoard extends AppCompatActivity
         } else
         {
             throw new IllegalArgumentException("index<0");
-
         }
     }
 
@@ -193,6 +210,17 @@ public class FightBoard extends AppCompatActivity
         if (p_index >= 0)
         {
             manager.setArme(p_index, p_rolled, p_kept);
+        } else
+        {
+            throw new IllegalArgumentException("index<0");
+        }
+    }
+
+    void STATChangedCallback(int p_index, int p_ND)
+    {
+        if (p_index >= 0)
+        {
+            manager.setND(p_index, p_ND);
         } else
         {
             throw new IllegalArgumentException("index<0");

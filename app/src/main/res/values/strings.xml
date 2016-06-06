@@ -20,4 +20,9 @@
     <string name="vdDefaultGarde">0</string>
     <string name="INVDialogTitle">Inventaire</string>
     <string name="invDialogOkButton">Modifier</string>
+    <string name="targetNDequals">ND Cible:</string>
+    <string name="defaultTargetND">33</string>
+    <string name="STATDialogTitle">Statut</string>
+
+
 </resources>

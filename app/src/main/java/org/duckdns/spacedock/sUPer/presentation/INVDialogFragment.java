@@ -45,7 +45,7 @@ public class INVDialogFragment extends DialogFragment
      * @param p_index
      * @return
      */
-    public static INVDialogFragment getInstance(int p_index, int p_rolled, int p_kept)
+    static INVDialogFragment getInstance(int p_index, int p_rolled, int p_kept)
     {
         INVDialogFragment frag = new INVDialogFragment();
         Bundle args = new Bundle();
