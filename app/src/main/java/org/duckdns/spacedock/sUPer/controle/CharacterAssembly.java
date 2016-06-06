@@ -3,6 +3,7 @@ package org.duckdns.spacedock.sUPer.controle;
 import libupsystem.Arme;
 import libupsystem.BasicNPCFighter;
 import libupsystem.Perso;
+import libupsystem.RollResult;
 
 /**
  * Created by iconoctopus on 6/6/16.
@@ -87,5 +88,20 @@ class CharacterAssembly
     boolean isActive(int p_phase)
     {
         return m_perso.isActif(p_phase);
+    }
+
+    int attack(int p_currentPhase)
+    {
+        int finalResult;
+        RollResult technicalResult = ((BasicNPCFighter) m_perso).attaquer(p_currentPhase, m_targetND);
+
+        if (technicalResult.isJetReussi())
+        {
+            finalResult = m_perso.genererDegats(technicalResult.getNbIncrements());
+        } else
+        {
+            finalResult = 0;
+        }
+        return (finalResult);
     }
 }

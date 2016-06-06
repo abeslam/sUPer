@@ -2,6 +2,7 @@ package org.duckdns.spacedock.sUPer.controle;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 
 //TODO : IMPORTANT blinder tous les accès à un objet charcaterassembly en vérifiant que son indice concorde avec celui de la liste!
@@ -27,6 +28,12 @@ public class SessionManager
      * liste des personnages
      */
     private ArrayList<CharacterAssembly> listFighters = new ArrayList<>();
+
+    /**
+     * liste des personnages actifs dans la phase en cours
+     */
+    private LinkedList<Integer> listActiveFighters = new LinkedList<>();
+    private ListIterator<Integer> activeFightersIterator = listActiveFighters.listIterator();
 
     /**
      * phase actuelle de la session de jeu
@@ -66,7 +73,7 @@ public class SessionManager
      * @param rm le RM du combattant à créer
      * @return l'indice qui a été affecté au nouveau combattant
      */
-    public CreationResult addFighter(int rm)
+    public ActionResult addFighter(int rm)
     {
         int newIndex;
         CharacterAssembly newFighter;
@@ -86,7 +93,12 @@ public class SessionManager
 
         boolean isActive = newFighter.isActive(currentPhase);
 
-        return (new CreationResult(newIndex, isActive));
+        if (isActive)//si le combattant est actif dans la phase courante, on ajoute son indice à la liste idoine
+        {
+            activeFightersIterator.add(newIndex);
+        }
+
+        return (new ActionResult(newIndex, isActive));
     }
 
     /**
@@ -98,28 +110,45 @@ public class SessionManager
     {
         indexIterator.add(index);
         indexIterator.previous();//replace le curseur au cran d'avant afin que hasNext() puisse répondre true lors de sa prochaine interrogation
-
         listFighters.set(index, null);//le combattant est supprimé de la liste (avec set() et pas remove() afin que sa case reste libre pour ne pas bordéliser les indices des autres
+        listActiveFighters.remove(Integer.valueOf(index));//on enlève le combattant de la liste des combatants actifs
+        activeFightersIterator = listActiveFighters.listIterator();//reset de l'itérateur associé
     }
 
-    public ArrayList<Integer> nextPhase()
+    public List<Integer> nextPhase()
     {
         ++currentPhase;
-        ArrayList<Integer> activeIndexes = new ArrayList<>();
+        listActiveFighters.clear();
+        activeFightersIterator = listActiveFighters.listIterator();
+
+        //ArrayList<Integer> activeIndexes = new ArrayList<>();
+
         for (int index = 0; index < listFighters.size(); ++index)
         {
             CharacterAssembly currentfighter = listFighters.get(index);
             if (currentfighter != null && currentfighter.isActive(currentPhase))//currentFighter peut très bien être null car on remplace juste les combattants retirés par des null pour conserver les indices
             {
-                activeIndexes.add(index);
+                //activeIndexes.add(index);
+                activeFightersIterator.add(index);
             }
         }
-
-        return activeIndexes;
+        return listActiveFighters;
     }
 
+    public ActionResult attack(int p_index)
+    {//TODO vérifier si ce combattant est bien actif
 
-
+        CharacterAssembly attacker = listFighters.get(p_index);
+        int degats = attacker.attack(currentPhase);
+        boolean stillActive = true;
+        if (!attacker.isActive(currentPhase))//si le combattant n'est plus actif on le retire de la liste de combattans actifs
+        {
+            listActiveFighters.remove(Integer.valueOf(p_index));
+            activeFightersIterator = listActiveFighters.listIterator();
+            stillActive = false;
+        }
+        return (new ActionResult(degats, stillActive));//dans ce cas le paramétre "success" indique si le combattant reste actif, pas si le jet est réussi, si le jet est raté les dégâts vaudront simplement 0
+    }
 
 
     /**
@@ -175,25 +204,31 @@ public class SessionManager
         return currentPhase;
     }
 
-    public class CreationResult
+    public boolean isAnyoneActive()
     {
-        int m_fighterIndex;
-        boolean m_active;
+        boolean notEmpty = !listActiveFighters.isEmpty();
+        return (notEmpty);
+    }
 
-        public CreationResult(int p_index, boolean p_active)
+    public class ActionResult
+    {
+        int m_effect;
+        boolean m_assessment;
+
+        public ActionResult(int p_effect, boolean p_assessment)
         {
-            m_fighterIndex = p_index;
-            m_active = p_active;
+            m_effect = p_effect;
+            m_assessment = p_assessment;
         }
 
-        public int getIndex()
+        public int getEffect()
         {
-            return m_fighterIndex;
+            return m_effect;
         }
 
-        public boolean isActive()
+        public boolean assess()
         {
-            return (m_active);
+            return (m_assessment);
         }
     }
 }

@@ -13,13 +13,16 @@ import org.duckdns.spacedock.sUPer.R;
 import org.duckdns.spacedock.sUPer.controle.SessionManager;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 
 //TODO : trier les éléments de strings.xml et décider d'un mode de nommage cohérent
 //TODO: renommer tous les paramétres en p_, les membres en m_ ; on ne se souciera pas des variables locales
 //TODO vérifier toutes les méthodes et les blinder suivant les principes de la prog par contrat
 //TODO dans toute l'application améliorer l'ordre de déclaration des membres par souci de cohérence
+//TODO repasser dans les xml et les fichiers de code et virer les chaines de caractères en dur
 //TODO à terme il pourrait s'avérer judicieux de fusionner la liste des vues graĥiques maintenues par cette application et la list équivalente du SessionManager (en un objet à instance unique dérivé d'ArrayList) ou de simplment supprimer la première qui n'est utilisée que pour supprimer les vues, on pourrait affecter un id aux vues et les supprimer via une recherche sur celui-ci
+
 /**
  * Activité principale : gère l'écran depuis lequel l'application débute
  */
@@ -48,28 +51,41 @@ public class FightBoard extends AppCompatActivity
             {
                 if (view.getId() == R.id.nextPhaseButton)//c'est le bouton "phase" qui a été cliqué
                 {
-                    ArrayList<Integer> activeIndexes = manager.nextPhase();
-                    ListIterator<Integer> fighterIterator = activeIndexes.listIterator();
+                    List<Integer> activeIndexes = manager.nextPhase();
+                    ListIterator<Integer> activeIterator = activeIndexes.listIterator();
 
-
-                    for (int index = 0; index < fighterList.size() && fighterIterator.hasNext(); ++index)//cette construction est possible parce que tous les tableaux sont maintenus triés
+                    for (int index = 0; index < fighterViewList.size(); ++index)
                     {
-                        FighterView currentPane = fighterList.get(index);
-                        if (index == fighterIterator.next())//ce combattant sera actif,
+                        FighterView currentPane = fighterViewList.get(index);
+                        Button attackButton = (Button) currentPane.findViewById(R.id.attackButton);
+                        if (activeIterator.hasNext() && index == activeIterator.next())//ce combattant sera actif,
                         {
-                            //appliquer le listener si pas déjà fait; passer le texte en vert
-                            setTextColor((TextView) currentPane.findViewById(R.id.attackButton), TextColor.OK);
+
+                            //autoriser le bouton; passer le texte en vert
+                            enableButton(attackButton);
+                            attackButton.setText(R.string.attackButton);
+
                         } else//le combattant est inactif ou n'existe pas
                         {
-                            fighterIterator.previous();
+                            if (activeIterator.hasPrevious())//quickfix inélégant pour éviter que l'itérateur, une fois utilisé, ne passe hors borne dans l'autre sens, à noter que ca le fait revenir à zéro pour rien
+                            {
+                                activeIterator.previous();
+                            }
                             if (currentPane != null)//currentPane pourrait bien être null puisqu'on ne supprime pas les cases vides afin de maintenir les index en lien avec la structuration physique des tables
                             {
-                                //supprimer le listener; passer le texte en rouge
-                                setTextColor((TextView) currentPane.findViewById(R.id.attackButton), TextColor.ALERT);
+                                //griser le bouton; passer le texte en rouge
+                                disableButton(attackButton);
+                                attackButton.setText(R.string.attackButton);
                             }
                         }
+
                     }
-                    ((Button) view).setText("" + manager.getCurrentPhase());
+                    nextPhaseButton.setText(getString(R.string.nextPhaseButton) + manager.getCurrentPhase());//on affiche le numéro de phase
+                    boolean anyoneActive = manager.isAnyoneActive();
+                    if (anyoneActive)//si un combattant est actif il devient impossible de changer de phase
+                    {
+                        disableButton(nextPhaseButton);
+                    }
                 }
             }
         }
@@ -107,7 +123,26 @@ public class FightBoard extends AppCompatActivity
                     {
                         if (id == R.id.attackButton)//c'est le bouton "attaquer" qui a été cliqué
                         {
-                            //TODO implémenter
+                            SessionManager.ActionResult attackResult = manager.attack(parentIndex);
+                            //si le combattant est inactif on désactive son bouton d'attaque
+                            if (!attackResult.assess())
+                            {
+                                disableButton((Button) view);
+                            }
+                            int degats = attackResult.getEffect();
+                            if (degats == 0)//l'attaque est un échec
+                            {
+                                ((Button) view).setText(R.string.attackFailed);
+                            } else
+                            {
+                                ((Button) view).setText("" + degats);
+                            }
+                            if (!manager.isAnyoneActive())//si c'était la dernière attaque du tour on active le bouton des phases
+                            {
+                                enableButton(nextPhaseButton);
+                            }
+
+
                         } else
                         {
                             if (id == R.id.statButton)//c'est le bouton "statut" qui a été cliqué
@@ -127,7 +162,7 @@ public class FightBoard extends AppCompatActivity
     private Button nextPhaseButton;
     private ViewGroup rootElement;
 
-    private ArrayList<FighterView> fighterList = new ArrayList<FighterView>();
+    private ArrayList<FighterView> fighterViewList = new ArrayList<FighterView>();
 
     /**
      * contrôleur unique (1 par lancement) de l'application
@@ -149,6 +184,11 @@ public class FightBoard extends AppCompatActivity
         //affectation des listeners
         addButton.setOnClickListener(fightBoardListener);
         nextPhaseButton.setOnClickListener(fightBoardListener);
+
+        //initialement le bouton de changement de phase est inactif
+        disableButton(nextPhaseButton);
+
+        nextPhaseButton.setText(getString(R.string.nextPhaseButton) + manager.getCurrentPhase());
     }
 
     /**
@@ -163,9 +203,9 @@ public class FightBoard extends AppCompatActivity
         {
             for (int i = 0; i < nb; ++i)
             {
-                SessionManager.CreationResult creationResult = manager.addFighter(rm);//récupération du premier indice libre et de si il est actif dans cette phase puis création du combattant côté contrôle
-                int index = creationResult.getIndex();
-                boolean activeFighter = creationResult.isActive();
+                SessionManager.ActionResult creationResult = manager.addFighter(rm);//récupération du premier indice libre et de si il est actif dans cette phase puis création du combattant côté contrôle
+                int index = creationResult.getEffect();
+                boolean activeFighter = creationResult.assess();
 
                 //création de la nouvelle FighterView
                 FighterView view = new FighterView(this, index);
@@ -189,20 +229,25 @@ public class FightBoard extends AppCompatActivity
                 //gestion du statut actif ou non du nouveau combattant
                 if (activeFighter)
                 {
-                    setTextColor(attackButton, TextColor.OK);
+                    enableButton(attackButton);
+                    disableButton(nextPhaseButton);//il y a au moins un combattant actif, on ne passe donc pas à la phase suivante
                 } else
                 {
-                    setTextColor(attackButton, TextColor.ALERT);
+                    disableButton(attackButton);
+                    if (!manager.isAnyoneActive())//personne n'est actif, on peut donc passer à la phase suivante
+                    {
+                        enableButton(nextPhaseButton);
+                    }
                 }
 
                 //ajout de la vue au paneau coulissant puis à la liste maintenue en interne par l'activité
                 rootElement.addView(view);
-                if (index == fighterList.size())
+                if (index == fighterViewList.size())
                 {
-                    fighterList.add(view);//en ce cas c'est un ajout en queue
+                    fighterViewList.add(view);//en ce cas c'est un ajout en queue
                 } else
                 {
-                    fighterList.set(index, view);//en ce cas on remplace une des références nulles par l'objet
+                    fighterViewList.set(index, view);//en ce cas on remplace une des références nulles par l'objet
                 }
             }
         } else
@@ -234,10 +279,14 @@ public class FightBoard extends AppCompatActivity
     {
         if (index >= 0)
         {
-            View view = fighterList.get(index);
+            View view = fighterViewList.get(index);
             rootElement.removeView(view);//on supprime la fighterview côté graphique
-            fighterList.set(index, null);//on supprime l'élément de la liste maintenue par l'application (pas par la méthode remove(), qui retrie ensuite pour supprimer l'espace vide et perd donc les indices tels que maintenus dans l'appli)
+            fighterViewList.set(index, null);//on supprime l'élément de la liste maintenue par l'application (pas par la méthode remove(), qui retrie ensuite pour supprimer l'espace vide et perd donc les indices tels que maintenus dans l'appli)
             manager.delFighter(index);//on supprime maintenant le personnage côté contrôle
+            if (!manager.isAnyoneActive())//si personne n'est actif suite à la suppression on active le bouton de changement de phase
+            {
+                enableButton(nextPhaseButton);
+            }
         } else
         {
             throw new IllegalArgumentException("index<0");
@@ -286,4 +335,17 @@ public class FightBoard extends AppCompatActivity
             }
         }
     }
+
+    private void enableButton(Button p_button)
+    {
+        p_button.setEnabled(true);
+        setTextColor(p_button, TextColor.OK);
+    }
+
+    private void disableButton(Button p_button)
+    {
+        p_button.setEnabled(false);
+        setTextColor(p_button, TextColor.ALERT);
+    }
+
 }

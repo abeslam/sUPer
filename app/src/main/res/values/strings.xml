@@ -5,7 +5,7 @@
     <string name="NewFighterDialogOkButton">Ajouter</string>
     <string name="DialogCancelButton">Annuler</string>
     <string name="addButton">+</string>
-    <string name="nextPhaseButton">PHASE</string>
+    <string name="nextPhaseButton">PHASE </string>
     <string name="delButton">X</string>
     <string name="unhurt">indemne</string>
     <string name="attackButton">attaquer!</string>
@@ -23,6 +23,7 @@
     <string name="targetNDequals">ND Cible:</string>
     <string name="defaultTargetND">33</string>
     <string name="STATDialogTitle">Statut</string>
+    <string name="attackFailed">Raté!</string>
 
 
 </resources>
