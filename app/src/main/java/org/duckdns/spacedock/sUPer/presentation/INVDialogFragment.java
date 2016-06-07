@@ -68,7 +68,7 @@ public class INVDialogFragment extends DialogFragment
         builder.setTitle(R.string.INVDialogTitle);
 
         //inflate la vue de la boite de dialogue à partir du layout xml et l'affecte au builder
-        View invSetupView = activity.getLayoutInflater().inflate(R.layout.fragment_inv_dialog, null);
+        View invSetupView = activity.getLayoutInflater().inflate(R.layout.fragment_inv_dialog, null);//TODO: voir si il est possible de passer autre chose que null comme rootelement
         builder.setView(invSetupView);
 
         //récupère des pointeurs sur les widgets d'interraction présents dans la boite dialogue
@@ -82,7 +82,7 @@ public class INVDialogFragment extends DialogFragment
         builder.setCancelable(true);//ainsi on pourra faire back pour annuler
 
         //Passe au bouton positif son listener, le négatif est géré par le fait qu'il n'y a simplement rien à faire en ce cas
-        builder.setPositiveButton(R.string.invDialogOkButton, INVDialogListener);
+        builder.setPositiveButton(R.string.DialogModify, INVDialogListener);
         builder.setNegativeButton(R.string.DialogCancelButton, null);
 
         //la méthode create produit la boite mais ne l'afiche pas, ce sera l'activité qui appellera show() sur ce fragment

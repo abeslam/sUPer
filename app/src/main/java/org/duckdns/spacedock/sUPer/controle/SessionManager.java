@@ -7,6 +7,7 @@ import java.util.ListIterator;
 
 //TODO : IMPORTANT blinder tous les accès à un objet charcaterassembly en vérifiant que son indice concorde avec celui de la liste!
 //TODO : les méthodes pour avancer de phase, ajouter un combattant, en retirer un ou en faire attaquer un devraient retourner un objet d'une classe adaptée (pas juste un actionresult générique), l'idée est de supprimer les getter qui brisent l'encapsulation pour les remplacer par un retour d'information intelligent de la part du SessionManager
+
 /**
  * Contrôleur gérant la session à la fois comme singleton de configuration mais aussi avec des méthodes de contrôle
  *
@@ -147,9 +148,9 @@ public class SessionManager
                     currentfighter.regenInit();
                 }
                 if (currentfighter.isActive(currentPhase))//currentFighter peut très bien être null car on remplace juste les combattants retirés par des null pour conserver les indices
-            {
-                activeFightersIterator.add(index);
-            }
+                {
+                    activeFightersIterator.add(index);
+                }
             }
         }
 
@@ -169,6 +170,31 @@ public class SessionManager
             stillActive = false;
         }
         return (new ActionResult(degats, stillActive));//dans ce cas le paramétre "success" indique si le combattant reste actif, pas si le jet est réussi, si le jet est raté les dégâts vaudront simplement 0
+    }
+
+    public HealthReport hurt(int p_index, int p_damage)
+    {
+        int nbFlesh = 0;
+        int nbDrama = 0;
+        boolean isStunned = false;
+        boolean isOut;
+
+        CharacterAssembly victim = listFighters.get(p_index);
+        victim.hurt(p_damage);
+
+        if (victim.isOut())
+        {
+            isOut = true;
+        } else
+        {
+            isOut = false;
+            nbFlesh = victim.getNbFleshWounds();
+            nbDrama = victim.getNbDramaWounds();
+            isStunned = victim.isStunned();
+        }
+
+        return (new HealthReport(nbFlesh, nbDrama, isStunned, isOut));
+
     }
 
 
@@ -258,5 +284,43 @@ public class SessionManager
         }
     }
 
+    public class HealthReport
+    {
+        int m_fleshNumber;
+        int m_dramaNumber;
+        boolean m_isStunned;
+        boolean m_isOut;
+
+        public HealthReport(int p_flesh, int p_drama, boolean p_stunned, boolean p_out)
+        {
+            m_fleshNumber = p_flesh;
+            m_dramaNumber = p_drama;
+            m_isStunned = p_stunned;
+            m_isOut = p_out;
+        }
+
+        public boolean isOut()
+        {
+            return (m_isOut);
+        }
+
+        public boolean isStunned()
+        {
+            return (m_isStunned);
+        }
+
+        public int getFleshWounds()
+        {
+            return (m_fleshNumber);
+        }
+
+        public int getDramaWounds()
+        {
+            return (m_dramaNumber);
+        }
+    }
 
 }
+
+
+

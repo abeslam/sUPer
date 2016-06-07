@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.duckdns.spacedock.sUPer.R;
 import org.duckdns.spacedock.sUPer.controle.SessionManager;
@@ -22,6 +23,7 @@ import java.util.ListIterator;
 //TODO repasser dans les xml et les fichiers de code et virer les chaines de caractères en dur
 //TODO à terme il pourrait s'avérer judicieux de fusionner la liste des vues graĥiques maintenues par cette application et la list équivalente du SessionManager (en un objet à instance unique dérivé d'ArrayList) ou de simplment supprimer la première qui n'est utilisée que pour supprimer les vues, on pourrait affecter un id aux vues et les supprimer via une recherche sur celui-ci
 //TODO il serait bon de vérifier que ce sont les bons claviers qui sont accessibles à chaque champ
+//TODO vérifier utilisation correcte des R.string avec getString()
 /**
  * Activité principale : gère l'écran depuis lequel l'application débute
  */
@@ -32,8 +34,6 @@ public class FightBoard extends AppCompatActivity
     {
         ALERT, OK
     }
-
-    ;
 
     /**
      * listener utilisé pour recueillir les clicks sur les bouton principaux de l'interface de l'activité principale (pour l'instant phase et ajouter) on utilise un seul listener avec un if car ainsi un seul objet est créé et pas deux
@@ -114,8 +114,8 @@ public class FightBoard extends AppCompatActivity
                 if (id == R.id.hurtButton)//c'est le bouton pour infliger des dégâts qui a été cliqué
                 {
                     //test provisoire
-                    Button placeholder = (Button) view;
-                    placeholder.setText("uncommonandverylong");
+                    HurtDialogFragment dialogFragment = HurtDialogFragment.getInstance(parentIndex);
+                    dialogFragment.show(getSupportFragmentManager(), "HurtDialog");
                 } else
                 {
                     if (id == R.id.invButton)//c'est le bouton d'inventaire qui a été cliqué
@@ -253,6 +253,18 @@ public class FightBoard extends AppCompatActivity
                     fighterViewList.set(index, view);//en ce cas on remplace une des références nulles par l'objet
                 }
             }
+            String creationConfirmation = "";
+            creationConfirmation = creationConfirmation.concat(getString(R.string.creation));
+            creationConfirmation = creationConfirmation.concat(String.valueOf(nb));
+            if (nb > 1)
+            {
+                creationConfirmation = creationConfirmation.concat(getString(R.string.fighters));
+            } else
+            {
+                creationConfirmation = creationConfirmation.concat(getString(R.string.fighter));
+            }
+            creationConfirmation = creationConfirmation.concat(String.valueOf(rm));
+            Toast.makeText(this, creationConfirmation, Toast.LENGTH_SHORT).show();
         } else
         {
             String message;
@@ -319,6 +331,37 @@ public class FightBoard extends AppCompatActivity
         if (p_index >= 0)
         {
             manager.setTargetND(p_index, p_ND);
+        } else
+        {
+            throw new IllegalArgumentException("index<0");
+        }
+    }
+
+    void HurtInflictedCallback(int p_index, int p_damage)
+    {
+        if (p_index >= 0)
+        {
+            SessionManager.HealthReport report = manager.hurt(p_index, p_damage);
+            if (!report.isOut())
+            {
+                String healthMessage = "";
+                if (report.isStunned())
+                {
+                    healthMessage = healthMessage.concat(getString(R.string.stunned));
+                    healthMessage = healthMessage.concat("\n");
+                }
+                healthMessage = healthMessage.concat(String.valueOf(report.getFleshWounds()));
+                healthMessage = healthMessage.concat("\n");
+                int nbDramaWounds = report.getDramaWounds();
+                for (int i = 0; i < nbDramaWounds; ++i)
+                {
+                    healthMessage = healthMessage.concat(getString(R.string.DramaWound));
+                }
+            } else
+            {
+                delFighter(p_index);
+                Toast.makeText(this, getString(R.string.outFromWounds), Toast.LENGTH_SHORT).show();
+            }
         } else
         {
             throw new IllegalArgumentException("index<0");

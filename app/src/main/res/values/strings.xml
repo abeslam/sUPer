@@ -17,16 +17,22 @@
     <string name="defaultName">Mowgli</string>
     <string name="vdEquals">VD=</string>
     <string name="g">g</string>
+    <string name="DramaWound">G</string>
     <string name="vdDefaultLance">0</string>
     <string name="vdDefaultGarde">0</string>
     <string name="INVDialogTitle">Inventaire</string>
-    <string name="invDialogOkButton">Modifier</string>
+    <string name="DialogModify">Modifier</string>
     <string name="targetNDequals">ND Cible:</string>
     <string name="defaultTargetND">33</string>
     <string name="STATDialogTitle">Statut</string>
     <string name="attackFailed">Raté!</string>
     <string name="DamageEquals">Dégâts infligés:</string>
     <string name="defaultDamageValue">0</string>
-
+    <string name="HurtDialogTitle">Blesser un combattant</string>
+    <string name="stunned">Sonné</string>
+    <string name="outFromWounds">Le combattant est au sol</string>
+    <string name="creation">Creation:</string>
+    <string name="fighter">combattant RM</string>
+    <string name="fighters">combattants RM</string>
 
 </resources>

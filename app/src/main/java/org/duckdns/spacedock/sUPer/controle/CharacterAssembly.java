@@ -90,6 +90,27 @@ class CharacterAssembly
         return m_perso.isActif(p_phase);
     }
 
+    boolean isOut()
+    {
+        return m_perso.isInconscient();
+    }
+
+    boolean isStunned()
+    {
+        return m_perso.isSonne();
+    }
+
+    int getNbFleshWounds()
+    {
+        return m_perso.getBlessuresLegeres();
+    }
+
+
+    int getNbDramaWounds()
+    {
+        return m_perso.getBlessuresLegeres();
+    }
+
     int attack(int p_currentPhase)
     {
         int finalResult;
@@ -104,6 +125,12 @@ class CharacterAssembly
         }
         return (finalResult);
     }
+
+    void hurt(int p_damage)
+    {
+        m_perso.etreBlesse(p_damage, 0);//pour l'instant on ne gère que les armes anciennes
+    }
+
 
     void regenInit()
     {

@@ -91,7 +91,7 @@ public class NewFighterDialogFragment extends DialogFragment
         builder.setTitle(R.string.NewFighterDialogTitle);
 
         //inflate la vue de la boite de dialogue à partir du layout xml et l'affecte au builder
-        View fighterSetupView = activity.getLayoutInflater().inflate(R.layout.fragment_new_fighter_dialog, null);
+        View fighterSetupView = activity.getLayoutInflater().inflate(R.layout.fragment_new_fighter_dialog, null);//TODO: voir si il est possible de passer autre chose que null comme rootelement
         builder.setView(fighterSetupView);
 
         //récupère des pointeurs sur les widgets d'interraction présents dans la boite dialogue
