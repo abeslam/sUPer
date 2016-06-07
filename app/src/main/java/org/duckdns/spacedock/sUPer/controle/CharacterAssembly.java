@@ -104,4 +104,9 @@ class CharacterAssembly
         }
         return (finalResult);
     }
+
+    void regenInit()
+    {
+        m_perso.genInit();
+    }
 }

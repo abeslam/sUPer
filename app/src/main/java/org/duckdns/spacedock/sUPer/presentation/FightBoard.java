@@ -13,7 +13,6 @@ import org.duckdns.spacedock.sUPer.R;
 import org.duckdns.spacedock.sUPer.controle.SessionManager;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.ListIterator;
 
 //TODO : trier les éléments de strings.xml et décider d'un mode de nommage cohérent
@@ -22,7 +21,7 @@ import java.util.ListIterator;
 //TODO dans toute l'application améliorer l'ordre de déclaration des membres par souci de cohérence
 //TODO repasser dans les xml et les fichiers de code et virer les chaines de caractères en dur
 //TODO à terme il pourrait s'avérer judicieux de fusionner la liste des vues graĥiques maintenues par cette application et la list équivalente du SessionManager (en un objet à instance unique dérivé d'ArrayList) ou de simplment supprimer la première qui n'est utilisée que pour supprimer les vues, on pourrait affecter un id aux vues et les supprimer via une recherche sur celui-ci
-
+//TODO il serait bon de vérifier que ce sont les bons claviers qui sont accessibles à chaque champ
 /**
  * Activité principale : gère l'écran depuis lequel l'application débute
  */
@@ -51,36 +50,40 @@ public class FightBoard extends AppCompatActivity
             {
                 if (view.getId() == R.id.nextPhaseButton)//c'est le bouton "phase" qui a été cliqué
                 {
-                    List<Integer> activeIndexes = manager.nextPhase();
-                    ListIterator<Integer> activeIterator = activeIndexes.listIterator();
+
+                    ListIterator<Integer> activeIterator = manager.nextPhase().listIterator();
 
                     for (int index = 0; index < fighterViewList.size(); ++index)
                     {
                         FighterView currentPane = fighterViewList.get(index);
-                        Button attackButton = (Button) currentPane.findViewById(R.id.attackButton);
-                        if (activeIterator.hasNext() && index == activeIterator.next())//ce combattant sera actif,
-                        {
+                        boolean cursorMovedInVain = false;
 
-                            //autoriser le bouton; passer le texte en vert
-                            enableButton(attackButton);
-                            attackButton.setText(R.string.attackButton);
-
-                        } else//le combattant est inactif ou n'existe pas
+                        if (currentPane != null)//il pourrait très bien être nul vu que les vues sont maintenues à leur indice même lorsque l'on en supprime une, il y a alors des trous
                         {
-                            if (activeIterator.hasPrevious())//quickfix inélégant pour éviter que l'itérateur, une fois utilisé, ne passe hors borne dans l'autre sens, à noter que ca le fait revenir à zéro pour rien
+                            Button attackButton = (Button) currentPane.findViewById(R.id.attackButton);
+                            if (activeIterator.hasNext())//ce combattant sera actif,
                             {
-                                activeIterator.previous();
-                            }
-                            if (currentPane != null)//currentPane pourrait bien être null puisqu'on ne supprime pas les cases vides afin de maintenir les index en lien avec la structuration physique des tables
+                                if (index == activeIterator.next())//le combattant est actif
+                                {
+                                    //autoriser le bouton; passer le texte en vert
+                                    enableButton(attackButton);
+                                    attackButton.setText(R.string.attackButton);
+                                } else//le combattant est inactif
+                                {
+                                    activeIterator.previous();//on a bougé le curseur pour rien
+                                    disableButton(attackButton);
+                                    attackButton.setText(R.string.attackButton);
+                                }
+
+                            } else//il n'y a plus de combattant actif, on ne s'occupe plus du curseur
                             {
                                 //griser le bouton; passer le texte en rouge
                                 disableButton(attackButton);
                                 attackButton.setText(R.string.attackButton);
                             }
                         }
-
                     }
-                    nextPhaseButton.setText(getString(R.string.nextPhaseButton) + manager.getCurrentPhase());//on affiche le numéro de phase
+                    nextPhaseButton.setText(getString(R.string.Turn) + " " + manager.getCurrentTurn() + " " + getString(R.string.Phase) + " " + manager.getCurrentPhase());//on affiche le numéro de phase
                     boolean anyoneActive = manager.isAnyoneActive();
                     if (anyoneActive)//si un combattant est actif il devient impossible de changer de phase
                     {
@@ -188,7 +191,7 @@ public class FightBoard extends AppCompatActivity
         //initialement le bouton de changement de phase est inactif
         disableButton(nextPhaseButton);
 
-        nextPhaseButton.setText(getString(R.string.nextPhaseButton) + manager.getCurrentPhase());
+        nextPhaseButton.setText(getString(R.string.Turn) + " " + manager.getCurrentTurn() + " " + getString(R.string.Phase) + " " + manager.getCurrentPhase());
     }
 
     /**

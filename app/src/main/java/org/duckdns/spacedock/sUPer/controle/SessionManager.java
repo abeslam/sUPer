@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 //TODO : IMPORTANT blinder tous les accès à un objet charcaterassembly en vérifiant que son indice concorde avec celui de la liste!
-
+//TODO : les méthodes pour avancer de phase, ajouter un combattant, en retirer un ou en faire attaquer un devraient retourner un objet d'une classe adaptée (pas juste un actionresult générique), l'idée est de supprimer les getter qui brisent l'encapsulation pour les remplacer par un retour d'information intelligent de la part du SessionManager
 /**
  * Contrôleur gérant la session à la fois comme singleton de configuration mais aussi avec des méthodes de contrôle
  *
@@ -41,6 +41,11 @@ public class SessionManager
     private int currentPhase;
 
     /**
+     * tour actuel de la session de jeu
+     */
+    private int currentTurn;
+
+    /**
      * instance du SessionMnager unique
      */
     private static SessionManager instance = null;
@@ -65,6 +70,7 @@ public class SessionManager
     private SessionManager()
     {
         currentPhase = 1;
+        currentTurn = 1;
     }
 
     /**
@@ -120,18 +126,33 @@ public class SessionManager
         ++currentPhase;
         listActiveFighters.clear();
         activeFightersIterator = listActiveFighters.listIterator();
+        boolean newTurn = false;
 
-        //ArrayList<Integer> activeIndexes = new ArrayList<>();
+        if (currentPhase > 10)//on doit passer au tour suivant
+        {
+            newTurn = true;
+            ++currentTurn;
+            currentPhase = 1;
+        }
+
 
         for (int index = 0; index < listFighters.size(); ++index)
         {
             CharacterAssembly currentfighter = listFighters.get(index);
-            if (currentfighter != null && currentfighter.isActive(currentPhase))//currentFighter peut très bien être null car on remplace juste les combattants retirés par des null pour conserver les indices
+
+            if (currentfighter != null)
             {
-                //activeIndexes.add(index);
+                if (newTurn)
+                {
+                    currentfighter.regenInit();
+                }
+                if (currentfighter.isActive(currentPhase))//currentFighter peut très bien être null car on remplace juste les combattants retirés par des null pour conserver les indices
+            {
                 activeFightersIterator.add(index);
             }
+            }
         }
+
         return listActiveFighters;
     }
 
@@ -204,6 +225,11 @@ public class SessionManager
         return currentPhase;
     }
 
+    public int getCurrentTurn()
+    {
+        return currentTurn;
+    }
+
     public boolean isAnyoneActive()
     {
         boolean notEmpty = !listActiveFighters.isEmpty();
@@ -231,4 +257,6 @@ public class SessionManager
             return (m_assessment);
         }
     }
+
+
 }
