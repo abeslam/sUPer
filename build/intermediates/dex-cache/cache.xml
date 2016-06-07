@@ -1,2 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<items version="2" />
+<items version="2" >
+
+    <item
+        jar="/home/iconoctopus/sources/android/projects/sUPer/app/build/intermediates/exploded-aar/com.android.support/support-v4/23.4.0/jars/classes.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="67bd36ee9340ec7c254108936ad16b24bed160cc">
+        <dex dex="/home/iconoctopus/sources/android/projects/sUPer/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-v4-23.4.0_42104294872af6a43b9ac2046e6532d09e41b689/classes.dex" />
+    </item>
+    <item
+        jar="/home/iconoctopus/sources/android/projects/sUPer/app/build/intermediates/exploded-aar/com.android.support/animated-vector-drawable/23.4.0/jars/classes.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="de4db3785756bfb0915a9f59a9b3f2fea7407be4">
+        <dex dex="/home/iconoctopus/sources/android/projects/sUPer/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-animated-vector-drawable-23.4.0_caef0e059bab1fc38f8d830aa9060b12f2ee594c/classes.dex" />
+    </item>
+    <item
+        jar="/home/iconoctopus/sources/android/sdk/extras/android/m2repository/com/android/support/support-annotations/23.4.0/support-annotations-23.4.0.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="ffbe55fdb2bb456b1485831706a9eac3300bb6b8">
+        <dex dex="/home/iconoctopus/sources/android/projects/sUPer/app/build/intermediates/transforms/dex/debug/folders/1000/10/support-annotations-23.4.0_a124f8b62a8a15504e193c0f356acaa51929b3c0/classes.dex" />
+    </item>
+    <item
+        jar="/home/iconoctopus/sources/android/projects/sUPer/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="be39c483a68537fe21edb61e41b0545f76080ef9">
+        <dex dex="/home/iconoctopus/sources/android/projects/sUPer/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run_3654f2dca60b758d936164477b9e7a646df4ea33/classes.dex" />
+    </item>
+    <item
+        jar="/home/iconoctopus/sources/android/projects/sUPer/app/build/intermediates/exploded-aar/com.android.support/support-vector-drawable/23.4.0/jars/classes.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="c2c594cace5d83a3227b2b6e658ecbfd586d3ed9">
+        <dex dex="/home/iconoctopus/sources/android/projects/sUPer/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-vector-drawable-23.4.0_4bf7dca17ace42632193d8a02f23247ae431868b/classes.dex" />
+    </item>
+    <item
+        jar="/home/iconoctopus/sources/android/projects/sUPer/app/libs/LibUpSystem.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="9afa0ca50880276fe1334f2fc5b067376e682abb">
+        <dex dex="/home/iconoctopus/sources/android/projects/sUPer/app/build/intermediates/transforms/dex/debug/folders/1000/2/LibUpSystem_efaba794c25da137cb9b01ddf7183a55aa81a260/classes.dex" />
+    </item>
+    <item
+        jar="/home/iconoctopus/sources/android/projects/sUPer/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.4.0/jars/classes.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="548f06de403a9409f00554b3ee12a9fdea0e236c">
+        <dex dex="/home/iconoctopus/sources/android/projects/sUPer/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-appcompat-v7-23.4.0_0626a012a50c8ef80fe3299d05f0bc00ae2d8118/classes.dex" />
+    </item>
+    <item
+        jar="/home/iconoctopus/sources/android/projects/sUPer/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="49853772a44827c08296e60fce32cb2b11503932">
+        <dex dex="/home/iconoctopus/sources/android/projects/sUPer/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run-bootstrap_ea6bce5122bf0de54e3b5983ae2c052e230b8f32/classes.dex" />
+    </item>
+    <item
+        jar="/home/iconoctopus/sources/android/projects/sUPer/app/build/intermediates/exploded-aar/com.android.support/support-v4/23.4.0/jars/libs/internal_impl-23.4.0.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="ea3c07504d2c8f4b13aa17c45c1b68ed9c1c3674">
+        <dex dex="/home/iconoctopus/sources/android/projects/sUPer/app/build/intermediates/transforms/dex/debug/folders/1000/10/internal_impl-23.4.0_2b858a708c60d9093fcbc40db071ae5ed522ba3b/classes.dex" />
+    </item>
+
+</items>

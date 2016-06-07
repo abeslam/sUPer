@@ -18,51 +18,52 @@ public class SessionManager
     /**
      * premier indice libre à la fin de la liste des combattants (il peut y a voir des trous dans la liste)
      */
-    private int currentIndex = 0;
-    /**
-     * liste des indices libres dans la liste des combattants
-     */
-    private LinkedList<Integer> listFreeIndex = new LinkedList<>();
-    private ListIterator<Integer> indexIterator = listFreeIndex.listIterator();
-
-    /**
-     * liste des personnages
-     */
-    private ArrayList<CharacterAssembly> listFighters = new ArrayList<>();
-
-    /**
-     * liste des personnages actifs dans la phase en cours
-     */
-    private LinkedList<Integer> listActiveFighters = new LinkedList<>();
-    private ListIterator<Integer> activeFightersIterator = listActiveFighters.listIterator();
+    private int m_currentIndex;
 
     /**
      * phase actuelle de la session de jeu
      */
-    private int currentPhase;
+    private int m_currentPhase;
 
     /**
      * tour actuel de la session de jeu
      */
-    private int currentTurn;
+    private int m_currentTurn;
 
     /**
-     * instance du SessionMnager unique
+     * liste des personnages
      */
-    private static SessionManager instance = null;
+    private ArrayList<CharacterAssembly> m_listFighters = new ArrayList<>();
+
+    /**
+     * liste des indices libres dans la liste des combattants
+     */
+    private LinkedList<Integer> m_listFreeIndex = new LinkedList<>();
+    private ListIterator<Integer> m_indexIterator = m_listFreeIndex.listIterator();
+
+    /**
+     * liste des personnages actifs dans la phase en cours
+     */
+    private LinkedList<Integer> m_listActiveFighters = new LinkedList<>();
+    private ListIterator<Integer> m_activeFightersIterator = m_listActiveFighters.listIterator();
+
+    /**
+     * instance unique du SessionMnager
+     */
+    private static SessionManager m_instance = null;//doit être statique pour être appelé par getInstance en contexte statique
 
     /**
      * pseudo-constructeur public garantissant un et un seul SessionManager par lancement de l'application
      *
      * @return le SessionManager actuel si il a été créé, un nouveau sinon
      */
-    public static SessionManager getInstance()
+    public static SessionManager getInstance()//doit être statique pour être appelé hors instanciation d'un objet
     {
-        if (instance == null)
+        if (m_instance == null)
         {
-            instance = new SessionManager();
+            m_instance = new SessionManager();
         }
-        return (instance);
+        return (m_instance);
     }
 
     /**
@@ -70,108 +71,144 @@ public class SessionManager
      */
     private SessionManager()
     {
-        currentPhase = 1;
-        currentTurn = 1;
+        m_currentPhase = 1;
+        m_currentTurn = 1;
+        m_currentIndex = 0;
     }
 
     /**
      * Crée un nouveau combattant côté controleur
      *
-     * @param rm le RM du combattant à créer
-     * @return l'indice qui a été affecté au nouveau combattant
+     * @param p_rm le RM du combattant à créer
+     * @return l'indice qui a été affecté au nouveau combattant et un booleen valant vrai si le personnage sera actif dans la phase en cours
      */
-    public ActionResult addFighter(int rm)
+    public ActionResult addFighter(int p_rm)
     {
         int newIndex;
-        CharacterAssembly newFighter;
-        if (indexIterator.hasNext())//il y a eu des libérations on renvoie donc la première case libre
+        boolean isActive;
+        if (p_rm > 0 && p_rm < 6)
         {
-            newIndex = (indexIterator.next()).intValue();
-            indexIterator.previous();//on a récupéré une valeur, il faut donc la supprimer de la liste car cet indice va désormais être occupé par un combattant
-            indexIterator.remove();
-            newFighter = new CharacterAssembly(newIndex, rm);
-            listFighters.set(newIndex, newFighter);//on ajoute le nouveau combattant à la liste à la place de celui qu'il remplace
-        } else//pas de case libre, la première case libre est donc l'indice, on l'incrémente après l'avoir récupéré
+            CharacterAssembly newFighter;
+            if (m_indexIterator.hasNext())//il y a eu des libérations on renvoie donc la première case libre
+            {
+                newIndex = (m_indexIterator.next()).intValue();
+                m_indexIterator.previous();//on a récupéré une valeur, il faut donc la supprimer de la liste car cet indice va désormais être occupé par un combattant
+                m_indexIterator.remove();
+                newFighter = new CharacterAssembly(p_rm);
+                m_listFighters.set(newIndex, newFighter);//on ajoute le nouveau combattant à la liste à la place de celui qu'il remplace
+            } else//pas de case libre, la première case libre est donc l'indice, on l'incrémente après l'avoir récupéré
+            {
+                newIndex = m_currentIndex++;
+                newFighter = new CharacterAssembly(p_rm);
+                m_listFighters.add(newFighter);//le nouveau combattant est ajouté en queue
+            }
+
+            isActive = newFighter.isActive(m_currentPhase);
+
+            if (isActive)//si le combattant est actif dans la phase courante, on ajoute son indice à la liste idoine
+            {
+                m_activeFightersIterator.add(newIndex);
+            }
+        } else
         {
-            newIndex = currentIndex++;
-            newFighter = new CharacterAssembly(newIndex, rm);
-            listFighters.add(newFighter);//le nouveau combattant est ajouté en queue
+            throw new IllegalArgumentException("RM doit être compris entre 1 et 5 inclus");
         }
-
-        boolean isActive = newFighter.isActive(currentPhase);
-
-        if (isActive)//si le combattant est actif dans la phase courante, on ajoute son indice à la liste idoine
-        {
-            activeFightersIterator.add(newIndex);
-        }
-
         return (new ActionResult(newIndex, isActive));
     }
 
     /**
      * Supprime un combattant côté contrôleur
      *
-     * @param index
+     * @param p_index indice du combattant à supprimer
      */
-    public void delFighter(int index)
+    public void delFighter(int p_index)
     {
-        indexIterator.add(index);
-        indexIterator.previous();//replace le curseur au cran d'avant afin que hasNext() puisse répondre true lors de sa prochaine interrogation
-        listFighters.set(index, null);//le combattant est supprimé de la liste (avec set() et pas remove() afin que sa case reste libre pour ne pas bordéliser les indices des autres
-        listActiveFighters.remove(Integer.valueOf(index));//on enlève le combattant de la liste des combatants actifs
-        activeFightersIterator = listActiveFighters.listIterator();//reset de l'itérateur associé
+        if (p_index >= 0)
+        {
+            m_indexIterator.add(p_index);
+            m_indexIterator.previous();//replace le curseur au cran d'avant afin que hasNext() puisse répondre true lors de sa prochaine interrogation
+            m_listFighters.set(p_index, null);//le combattant est supprimé de la liste (avec set() et pas remove() afin que sa case reste libre pour ne pas bordéliser les indices des autres
+            m_listActiveFighters.remove(Integer.valueOf(p_index));//on enlève le combattant de la liste des combatants actifs
+            m_activeFightersIterator = m_listActiveFighters.listIterator();//reset de l'itérateur associé
+        } else
+        {
+            throw new IllegalArgumentException("Index<0");
+        }
     }
 
+    /**
+     * passe à la phase suivante voire au tour suivant
+     *
+     * @return la liste des indices des combattants actifs
+     */
     public List<Integer> nextPhase()
     {
-        ++currentPhase;
-        listActiveFighters.clear();
-        activeFightersIterator = listActiveFighters.listIterator();
+        ++m_currentPhase;
+        m_listActiveFighters.clear();//la list des combattants actifs est vidée pour être reconstruite
+        m_activeFightersIterator = m_listActiveFighters.listIterator();//on reset l'itérateur
         boolean newTurn = false;
 
-        if (currentPhase > 10)//on doit passer au tour suivant
+        if (m_currentPhase > 10)//on doit passer au tour suivant
         {
             newTurn = true;
-            ++currentTurn;
-            currentPhase = 1;
+            ++m_currentTurn;
+            m_currentPhase = 1;
         }
 
-
-        for (int index = 0; index < listFighters.size(); ++index)
+        for (int index = 0; index < m_listFighters.size(); ++index)//parcours de la liste de tous les combattants
         {
-            CharacterAssembly currentfighter = listFighters.get(index);
+            CharacterAssembly currentfighter = m_listFighters.get(index);
 
-            if (currentfighter != null)
+            if (currentfighter != null)//currentFighter peut très bien être null car on remplace juste les combattants retirés par des null pour conserver les indices
             {
                 if (newTurn)
                 {
-                    currentfighter.regenInit();
+                    currentfighter.regenInit();//nouveau tour, les combattants voient leur initiative régénérée pour le nouveau tour
                 }
-                if (currentfighter.isActive(currentPhase))//currentFighter peut très bien être null car on remplace juste les combattants retirés par des null pour conserver les indices
+                if (currentfighter.isActive(m_currentPhase))
                 {
-                    activeFightersIterator.add(index);
+                    m_activeFightersIterator.add(index);//chaque personnage actif dans la phase courante est ajouté à la liste idoine
                 }
             }
         }
 
-        return listActiveFighters;
+        return m_listActiveFighters;
     }
 
+    /**
+     * fait attaquer un personnage contre le ND de sa cible actuelle
+     *
+     * @param p_index l'indice du personnage
+     * @return une structure contenant les dégâts infligés (0 si échec) et un booléen indiquant si le combattant reste actif après attaque
+     */
     public ActionResult attack(int p_index)
     {//TODO vérifier si ce combattant est bien actif
-
-        CharacterAssembly attacker = listFighters.get(p_index);
-        int degats = attacker.attack(currentPhase);
-        boolean stillActive = true;
-        if (!attacker.isActive(currentPhase))//si le combattant n'est plus actif on le retire de la liste de combattans actifs
+//TODO améliorer la valeur de retour par un booléen indiquant la réussite ou non de l'attaque ainsi que le statut actif explicite du perso plutot que le bricolage actuel basé sur une comparaison à 0 dans la classe appelante
+        if (p_index >= 0)
         {
-            listActiveFighters.remove(Integer.valueOf(p_index));
-            activeFightersIterator = listActiveFighters.listIterator();
-            stillActive = false;
+            CharacterAssembly attacker = m_listFighters.get(p_index);
+            int degats = attacker.attack(m_currentPhase);
+            boolean stillActive = true;
+            if (!attacker.isActive(m_currentPhase))//si le combattant n'est plus actif on le retire de la liste de combattans actifs
+            {
+                m_listActiveFighters.remove(Integer.valueOf(p_index));
+                m_activeFightersIterator = m_listActiveFighters.listIterator();
+                stillActive = false;
+            }
+            return (new ActionResult(degats, stillActive));//dans ce cas le paramétre booléen indique si le combattant reste actif, pas si le jet est réussi, si le jet est raté les dégâts vaudront simplement 0
+        } else
+        {
+            throw new IllegalArgumentException("index<0");
         }
-        return (new ActionResult(degats, stillActive));//dans ce cas le paramétre "success" indique si le combattant reste actif, pas si le jet est réussi, si le jet est raté les dégâts vaudront simplement 0
     }
 
+    /**
+     * Inflige des dégâts au personnage indiqué
+     *
+     * @param p_index  indice du personnage ciblé
+     * @param p_damage dégâts à infliger
+     * @return une structure contenant le nombres de blessures légères et graves ainsi que le statut sonné/inconscient du personnage
+     */
     public HealthReport hurt(int p_index, int p_damage)
     {
         int nbFlesh = 0;
@@ -179,89 +216,167 @@ public class SessionManager
         boolean isStunned = false;
         boolean isOut;
 
-        CharacterAssembly victim = listFighters.get(p_index);
-        victim.hurt(p_damage);
-
-        if (victim.isOut())
+        if (p_index >= 0 && p_damage >= 0)
         {
-            isOut = true;
+            CharacterAssembly victim = m_listFighters.get(p_index);
+            victim.hurt(p_damage);
+
+            if (victim.isOut())//si la victime est éliminée on ne va pas plus loin dans l'évaluation de son statut
+            {
+                isOut = true;
+            } else
+            {
+                isOut = false;
+                nbFlesh = victim.getNbFleshWounds();
+                nbDrama = victim.getNbDramaWounds();
+                isStunned = victim.isStunned();
+            }
         } else
         {
-            isOut = false;
-            nbFlesh = victim.getNbFleshWounds();
-            nbDrama = victim.getNbDramaWounds();
-            isStunned = victim.isStunned();
+            throw new IllegalArgumentException("indice et dégâts doivent être supérieurs ou égaux à 0");
         }
-
         return (new HealthReport(nbFlesh, nbDrama, isStunned, isOut));
-
     }
 
 
     /**
      * renvoie le nom d'un combattant
      *
-     * @param index son indice dans les listes
-     * @return
+     * @param p_index son indice dans les listes
+     * @return la chaine représentant son nom, issue de la couche libupsystem
      */
-    public String getName(int index)
+    public String getName(int p_index)
     {
-        return listFighters.get(index).getLibellePerso();
+        if (p_index >= 0)
+        {
+            return m_listFighters.get(p_index).getLibellePerso();
+        } else
+        {
+            throw new IllegalArgumentException("indice<0");
+        }
     }
 
     /**
      * affecte l'arme passée en paramétre au combattant d'indice passé en paramétre
      *
-     * @param p_index
-     * @param p_rolled
-     * @param p_kept
+     * @param p_index  indice du combattant
+     * @param p_rolled dés lancés
+     * @param p_kept   dés gardés
      */
     public void setArme(int p_index, int p_rolled, int p_kept)
     {
-        listFighters.get(p_index).setArme(p_rolled, p_kept);
+        if (p_index >= 0 && p_rolled >= 0 && p_kept >= 0)
+        {
+            m_listFighters.get(p_index).setArme(p_rolled, p_kept);
+        } else
+        {
+            throw new IllegalArgumentException("indice et nombres de dés doivent être >=0");
+        }
     }
 
+    /**
+     * @param p_index indice du combattant
+     * @return dés lancés de l'arme du combattant
+     */
     public int getVDRolled(int p_index)
     {
-        return listFighters.get(p_index).getVDRolled();
+        if (p_index >= 0)
+        {
+            return m_listFighters.get(p_index).getVDRolled();
+        } else
+        {
+            throw new IllegalArgumentException("indice < 0");
+        }
     }
 
+    /**
+     * @param p_index indice du combattant
+     * @return dés gardés de l'arme du combattant
+     */
     public int getVDKept(int p_index)
     {
-        return listFighters.get(p_index).getVDKept();
+        if (p_index >= 0)
+        {
+            return m_listFighters.get(p_index).getVDKept();
+        } else
+        {
+            throw new IllegalArgumentException("indice < 0");
+        }
     }
 
+    /**
+     * @param p_index indice du combattant
+     * @param p_ND    le ND de la cible
+     */
     public void setTargetND(int p_index, int p_ND)
     {
-        listFighters.get(p_index).setTargetND(p_ND);
+        if (p_index >= 0 && p_ND >= 0)
+        {
+            m_listFighters.get(p_index).setTargetND(p_ND);
+        } else
+        {
+            throw new IllegalArgumentException("indice et ND doivent être >=0");
+        }
     }
 
+    /**
+     * @param p_index indice du combattant
+     * @return le ND de la cible
+     */
     public int getTargetND(int p_index)
     {
-        return listFighters.get(p_index).getTargetND();
+        if (p_index >= 0)
+        {
+            return m_listFighters.get(p_index).getTargetND();
+        } else
+        {
+            throw new IllegalArgumentException("indice < 0");
+        }
     }
 
+    /**
+     * @param p_index indice du combattant
+     * @return le ND du combattant lui-même
+     */
     public int getFighterND(int p_index)
     {
-        return listFighters.get(p_index).getFighterND();
+        if (p_index >= 0)
+        {
+            return m_listFighters.get(p_index).getFighterND();
+        } else
+        {
+            throw new IllegalArgumentException("indice < 0");
+        }
     }
 
+    /**
+     * @return la phase courante
+     */
     public int getCurrentPhase()
     {
-        return currentPhase;
+        return m_currentPhase;
     }
 
+    /**
+     * @return le tour courant
+     */
     public int getCurrentTurn()
     {
-        return currentTurn;
+        return m_currentTurn;
     }
 
+    /**
+     * @return un booléen indiquant si un personnage est actif dans la phase en cours
+     */
     public boolean isAnyoneActive()
     {
-        boolean notEmpty = !listActiveFighters.isEmpty();
+        boolean notEmpty = !m_listActiveFighters.isEmpty();
         return (notEmpty);
     }
 
+    /**
+     * classe représentant le résultat d'une action
+     */
     public class ActionResult
     {
         int m_effect;
@@ -284,6 +399,9 @@ public class SessionManager
         }
     }
 
+    /**
+     * classe permettant de représenter l'état de santé d'un personnage
+     */
     public class HealthReport
     {
         int m_fleshNumber;
