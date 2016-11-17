@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="LibUpSystem">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/libs/LibUpSystem.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

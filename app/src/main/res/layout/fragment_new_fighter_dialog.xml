@@ -1,44 +1,45 @@
-<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:columnCount="3"
-            android:rowCount="2"
-            tools:context="org.duckdns.spacedock.sUPer.presentation.NewFighterDialogFragment">
+<android.support.v7.widget.GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                      xmlns:app="http://schemas.android.com/apk/res-auto"
+                                      xmlns:tools="http://schemas.android.com/tools"
+                                      android:layout_width="match_parent"
+                                      android:layout_height="match_parent"
+                                      app:columnCount="3"
+                                      app:rowCount="2"
+                                      tools:context="org.duckdns.spacedock.sUPer.presentation.NewFighterDialogFragment">
 
     <TextView
-        android:text="RM:"
-        android:layout_gravity="left"/>
+        app:layout_gravity="left"
+        android:text="RM:"/>
 
     <SeekBar
         android:id="@+id/rmSeekBar"
+        app:layout_columnWeight="100"
         android:max="4"
         android:progress="2"
-        android:layout_columnWeight="100"
         />
 
     <TextView
         android:id="@+id/rmValue"
-        android:layout_gravity="right"
+        app:layout_gravity="right"
         android:text="3"
         />
 
     <TextView
-        android:text="nb:"
-        android:layout_gravity="left"/>
+        app:layout_gravity="left"
+        android:text="nb:"/>
 
     <SeekBar
         android:id="@+id/nbSeekBar"
+        app:layout_columnWeight="100"
         android:max="4"
         android:progress="0"
-        android:layout_columnWeight="100"
         />
 
     <TextView
         android:id="@+id/nbValue"
-        android:layout_gravity="right"
+        app:layout_gravity="right"
         android:text="1"
         />
 
 
-</GridLayout>
+</android.support.v7.widget.GridLayout>
